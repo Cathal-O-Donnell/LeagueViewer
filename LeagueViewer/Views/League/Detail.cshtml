@@ -1,0 +1,167 @@
+﻿@model LeagueViewer.ViewModels.League.DetailViewModel
+
+<div class="row">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light center">
+            <div class="navbar-inner marginAuto">
+                <ul class="navbar-nav">
+
+                    @foreach (var leagueNav in Model.LeagueNavigation)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Detail", "League", new { leagueId = leagueNav.LeagueId })">
+                                <span><img src="@leagueNav.CountryFlag" alt="leagueNav.Name" onerror="this.src='';" width="14" height="10" style="margin-top: 2px; margin-bottom: 2px;"> @leagueNav.Name</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <h4>@Model.League.Name</h4>
+
+    @if (Model.PreviousFixtures.Any())
+    {
+        <div class="col-12">
+            <table cellspacing="4" cellpadding="0" border="0" width="100%" style="border-spacing: 2px;">
+                <tbody>
+                    <tr>
+                        @foreach (var fixture in Model.PreviousFixtures)
+                        {
+                            <td align="center" valign="middle" style=" margin:5px; cursor:pointer" onclick="location.href='@(Url.Action("Detail", "Fixture", new { fixtureId = fixture.Id }))'">
+                                <span title="@fixture.HomeTeam.Name - @fixture.AwayTeam.Name">
+                                    <table cellspacing="1" cellpadding="1" border="0" width="75%" style="background-color:#f2f2f2">
+                                        <tbody>
+                                            <tr bgcolor="#bfbfbf" height="12">
+                                                <td colspan="2" align="center" valign="middle" line-height:11px;'>
+                                                    <font class="font-weight-bolder" style="font-size:12px; color:#fcfcfc;">@fixture.FixtureDate.Value.ToString("ddd dd MMM").ToUpper()</font>
+                                                </td>
+                                            </tr>
+                                            <tr style="padding-bottom: 5px;">
+                                                <td align="center" valign="middle"><img src="@fixture.HomeTeam.Logo" class="image-hover" width="20" height="20" /> - @fixture.HomeScore</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 5px;" align="center" valign="middle"><img src="@fixture.AwayTeam.Logo" class="image-hover" width="20" height="20" /> - @fixture.AwayScore </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </span>
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="col-8" style="margin-top: 20px;">
+
+        @* League table *@
+        <table id="tblLeagueStandings" class="table table-condensed table-sm table-bordered" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>@* Rank *@</th>
+                    <th>Club</th>
+                    <th>MP</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>Form</th>
+                    <th>GF</th>
+                    <th>GA</th>
+                    <th>GD</th>
+                    <th>Pts</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var club in Model.LeagueStandings)
+                {
+                    <tr class="@club.TableRowClass">
+                        <td>@String.Format("{0}.", club.Rank)</td>
+                        <td><span><img src="@club.Logo" width="20" height="20" /></span> @Html.ActionLink(@club.TeamName, "Details", "Team", new { @id = club.TeamId, leagueId = Model.League.Id }, null)</td>
+                        <td>@club.All.MatchsPlayed</td>
+                        <td>@club.All.Win</td>
+                        <td>@club.All.Draw</td>
+                        <td>@club.All.Lose</td>
+                        <td style="white-space:nowrap; padding-left: 2px; padding-right: 2px; width: 1px;">
+                            @foreach (var result in club.Form)
+                            {
+                                switch (result)
+                                {
+                                    case Enums.Result.Loss:
+                                        <span class="dot loss"></span>
+                                        break;
+                                    case Enums.Result.Draw:
+                                        <span class="dot draw"></span>
+                                        break;
+                                    case Enums.Result.Win:
+                                        <span class="dot win"></span>
+                                        break;
+                                }
+                            }
+                        </td>
+                        <td>@club.All.GoalsFor</td>
+                        <td>@club.All.GoalsAgaints</td>
+                        <td>@club.GoalsDiff</td>
+                        <td>@club.Points</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-4" style="margin-top: 20px;">
+
+        @* League fixtures*@
+        @if (Model.UpcomingFixtures.Any())
+        {
+            <div>
+                <h6 class="text-muted">Upcoming Fixtures</h6>
+                <table class="table table-condensed table-sm">
+                    <tbody>
+                        @foreach (var fixture in Model.UpcomingFixtures)
+                        {
+                            <tr>
+                                <td class="text-muted">@fixture.FixtureDate.Value.ToString("dd/MM/yy")</td>
+                                <td class="text-center font-weight-bold">@fixture.HomeTeam.Name - @fixture.AwayTeam.Name</td>
+                                <td class="text-muted">@fixture.FixtureDate.Value.ToString("HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* League top scorers *@
+        @if (Model.TopScorers.Any())
+        {
+            <div>
+                <h6 class="text-muted">Top Scorers</h6>
+                <table class="table table-condensed table-sm table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Player</th>
+                            <th>Goals</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var player in Model.TopScorers)
+                        {
+                            <tr>
+                                <td><span><img src="@player.TeamLogo" width="20" height="20" /></span> @player.Name</td>
+                                <td>@player.GoalStats.Total</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="~/scripts/League/detail.js"></script>

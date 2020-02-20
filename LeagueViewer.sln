@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeagueViewer", "LeagueViewer/LeagueViewer.csproj", "{53E38097-E253-4A91-BDFE-AFC137A52835}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeagueViewer.Tests", "LeagueViewer.Tests\LeagueViewer.Tests.csproj", "{C0297190-E476-491B-B489-FE6915AACDF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53E38097-E253-4A91-BDFE-AFC137A52835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53E38097-E253-4A91-BDFE-AFC137A52835}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53E38097-E253-4A91-BDFE-AFC137A52835}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53E38097-E253-4A91-BDFE-AFC137A52835}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0297190-E476-491B-B489-FE6915AACDF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0297190-E476-491B-B489-FE6915AACDF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0297190-E476-491B-B489-FE6915AACDF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0297190-E476-491B-B489-FE6915AACDF8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4FD48A7-BA3D-4B08-B6FF-92B4F6006D39}
+	EndGlobalSection
+EndGlobal

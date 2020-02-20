@@ -1,0 +1,73 @@
+﻿@model LeagueViewer.ViewModels.Team.SquadViewModel
+
+@{
+    ViewData["Title"] = "Squad";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">@Html.ActionLink(Model.League.Name, "Detail", "League", new { leagueId = Model.League.Id }, null)</li>
+                <li class="breadcrumb-item active" aria-current="page">@Html.ActionLink(Model.Team.Name, "Details", "Team", new { id = Model.Team.Id, leagueId = Model.League.Id }, null)</li>
+                <li class="breadcrumb-item active" aria-current="page">Squad</li>
+            </ol>
+        </nav>
+
+        <div class="col-12 text-center" style="margin-top: 10px;">
+            <h4><span><img src="@Model.Team.Logo" width="30" height="30" /></span> @Model.Team.Name</h4>
+        </div>
+    </div>
+
+    <div class="col-12 text-center" style="margin-top: 10px;">
+        <table id="tblSquad" class="table table-condensed table-sm table-hover table-bordered" style="font-size: 12px;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Nationality</th>
+                    <th>Age</th>
+                    <th>Goals</th>
+                    <th>Shots</th>
+                    <th>On Target</th>
+                    <th>Passes</th>
+                    <th>Pass Accuracy</th>
+                    <th>Red Cards</th>
+                    <th>Yellow Cards</th>
+                    <th>Apperances</th>
+                    <th>Mins Played</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var player in Model.Players)
+                {
+                    <tr>
+                        <td>
+                            @if (player.IsCaptain == 1)
+                            {
+                                <span class="badge badge-success" style="margin-right: 5px;" title="captain">C</span>
+                            }
+                            @player.Name
+                        </td>
+                        <td>@player.Position</td>
+                        <td>@player.Nationality</td>
+                        <td>@player.Age</td>
+                        <td>@player.Goals.Total</td>
+                        <td>@(player.Shots.Total.HasValue ? player.Shots.Total.ToString() : "")</td>
+                        <td>@(player.Shots.OnTarget.HasValue ? player.Shots.OnTarget.ToString() : "")</td>
+                        <td>@(player.Passes.Total.HasValue ? player.Passes.Total.ToString() : "")</td>
+                        <td>@(player.Passes.Accuracy.HasValue ? player.Passes.Accuracy.ToString() : "")</td>
+                        <td>@(player.Cards.Red.HasValue ? player.Cards.Red.ToString() : "")</td>
+                        <td>@(player.Cards.Yellow.HasValue ? player.Cards.Yellow.ToString() : "")</td>
+                        <td>@(player.Games.Apperances.HasValue ? player.Games.Apperances.ToString() : "")</td>
+                        <td>@(player.Games.MinutesPlayed.HasValue ? player.Games.MinutesPlayed.ToString() : "")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="~/scripts/Team/squad.js"></script>

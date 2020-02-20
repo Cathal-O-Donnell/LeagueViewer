@@ -1,0 +1,146 @@
+﻿@model LeagueViewer.ViewModels.Fixture.DetailViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+
+        @if (Model.TeamId != null)
+        {
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">@Html.ActionLink(Model.League.Name, "Detail", "League", new { leagueId = Model.League.Id }, null)</li>
+                    <li class="breadcrumb-item active" aria-current="page">@Html.ActionLink(Model.Team.Name, "Details", "Team", new { id = Model.Team.Id, leagueId = Model.League.Id }, null)</li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Fixture.HomeTeam.Name - @Model.Fixture.AwayTeam.Name</li>
+                </ol>
+            </nav>
+        }
+        else
+        {
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">@Html.ActionLink(Model.League.Name, "Detail", "League", new { leagueId = Model.League.Id }, null)</li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Fixture.HomeTeam.Name - @Model.Fixture.AwayTeam.Name</li>
+                </ol>
+            </nav>
+        }
+
+        <div class="col-8 offset-md-2 text-center" style="margin-top: 10px;">
+
+            <h5>@Model.Fixture.StatusShort</h5>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img class="image-hover" src="@Model.Fixture.HomeTeam.Logo" width="50" />
+                            <br />
+                            <br />
+
+                            <span>@Html.ActionLink(Model.Fixture.HomeTeam.Name, "Details", "Team", new { id = Model.Fixture.HomeTeam.Id, leagueId = Model.League.Id }, null)</span>
+                        </td>
+                        <td><span style="font-size: 40px;">@Model.Fixture.HomeScore</span></td>
+                        <td class="text-muted" style="font-size: 40px;"> - </td>
+                        <td><span style="font-size: 40px;">@Model.Fixture.AwayScore</span></td>
+                        <td>
+                            <img class="image-hover" src="@Model.Fixture.AwayTeam.Logo" width="50" />
+                            <br />
+                            <br />
+
+                            <span>@Html.ActionLink(Model.Fixture.AwayTeam.Name, "Details", "Team", new { id = Model.Fixture.AwayTeam.Id, leagueId = Model.League.Id }, null)</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            @if (Model.Fixture.FixtureEvents != null)
+            {
+                <hr />
+                <div class="row">
+                    <div class="col-6">
+                        @foreach (var fixtureEvent in Model.Fixture.FixtureEvents.Where(x => x.TeamId == Model.Fixture.HomeTeam.Id))
+                        {
+                            @Html.Raw(fixtureEvent.HtmlString)
+                        }
+                    </div>
+                    <div class="col-6">
+                        @foreach (var fixtureEvent in Model.Fixture.FixtureEvents.Where(x => x.TeamId == Model.Fixture.AwayTeam.Id))
+                        {
+                            @Html.Raw(fixtureEvent.HtmlString)
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model.Fixture.Statistics != null)
+    {
+        <div class="col-8 offset-md-2">
+            <hr />
+            <div class="row">
+                <table class="table table-condensed borderless table-sm text-center">
+                    <tbody>
+                        <tr>
+                            <td>@Model.Fixture.Statistics.TotalShots.Home</td>
+                            <td class="text-muted font-weight-bolder">Shots</td>
+                            <td>@Model.Fixture.Statistics.TotalShots.Away</td>
+                        </tr>
+                        <tr>
+                            <td>@Model.Fixture.Statistics.ShotsOnTarget.Home</td>
+                            <td class="text-muted font-weight-bolder">Shots on target</td>
+                            <td>@Model.Fixture.Statistics.ShotsOnTarget.Away</td>
+
+                        </tr>
+                        <tr>
+                            <td>@Model.Fixture.Statistics.Possession.Home</td>
+                            <td class="text-muted font-weight-bolder">Posession</td>
+                            <td>@Model.Fixture.Statistics.Possession.Away</td>
+                        </tr>
+                        <tr>
+                            <td>@Model.Fixture.Statistics.Passes.Home</td>
+                            <td class="text-muted font-weight-bolder">Passes</td>
+                            <td>@Model.Fixture.Statistics.Passes.Away</td>
+                        </tr>
+                        @if (!String.IsNullOrEmpty(Model.Fixture.Statistics.PassAccuracyHome) || !String.IsNullOrEmpty(Model.Fixture.Statistics.PassAccuracyAway))
+                        {
+                            <tr>
+                                <td>@Model.Fixture.Statistics.PassAccuracyHome</td>
+                                <td class="text-muted font-weight-bolder">Pass Accuracy</td>
+                                <td>@Model.Fixture.Statistics.PassAccuracyAway</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td>@(Model.Fixture.Statistics.Fouls.Home.HasValue ? (Model.Fixture.Statistics.Fouls.Home.ToString()) : "0")</td>
+                            <td class="text-muted font-weight-bolder">Fouls</td>
+                            <td>@(Model.Fixture.Statistics.Fouls.Away.HasValue ? (Model.Fixture.Statistics.Fouls.Away.ToString()) : "0")</td>
+                        </tr>
+                        <tr>
+                            <td>@(Model.Fixture.Statistics.YellowCards.Home.HasValue ? (Model.Fixture.Statistics.YellowCards.Home.ToString()) : "0")</td>
+                            <td class="text-muted font-weight-bolder">Yellow cards</td>
+                            <td>@(Model.Fixture.Statistics.YellowCards.Away.HasValue ? (Model.Fixture.Statistics.YellowCards.Away.ToString()) : "0")</td>
+                        </tr>
+                        <tr>
+                            <td>@(Model.Fixture.Statistics.RedCards.Home.HasValue ? (Model.Fixture.Statistics.RedCards.Home.ToString()) : "0")</td>
+                            <td class="text-muted font-weight-bolder">Red cards</td>
+                            <td>@(Model.Fixture.Statistics.RedCards.Away.HasValue ? (Model.Fixture.Statistics.RedCards.Away.ToString()) : "0")</td>
+                        </tr>
+                        <tr>
+                            <td>@(Model.Fixture.Statistics.Offsides.Home.HasValue ? (Model.Fixture.Statistics.Offsides.Home.ToString()) : "0")</td>
+                            <td class="text-muted font-weight-bolder">Offsides</td>
+                            <td>@(Model.Fixture.Statistics.Offsides.Away.HasValue ? (Model.Fixture.Statistics.Offsides.Away.ToString()) : "0")</td>
+                        </tr>
+                        <tr>
+                            <td>@(Model.Fixture.Statistics.Corners.Home.HasValue ? (Model.Fixture.Statistics.Corners.Home.ToString()) : "0")</td>
+                            <td class="text-muted font-weight-bolder">Corners</td>
+                            <td>@(Model.Fixture.Statistics.Corners.Away.HasValue ? (Model.Fixture.Statistics.Corners.Away.ToString()) : "0")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
