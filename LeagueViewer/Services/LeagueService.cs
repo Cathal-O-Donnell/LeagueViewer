@@ -291,50 +291,74 @@ namespace LeagueViewer.Services
 
         public async Task<IEnumerable<LeagueNavigation>> GetLeagueNavigation()
         {
-            var leagues = new List<League>();
-            var leagueNavigations = new List<LeagueNavigation>();
-
-            var premierLeagueTask = GetLeague(_currentLeagueSeasons.PremierLeague);
-            var scottishPremierLeagueTask = GetLeague(_currentLeagueSeasons.ScottishPremierLeague);
-            var bundesligaTask = GetLeague(_currentLeagueSeasons.Bundesliga);
-            var serieATask = GetLeague(_currentLeagueSeasons.SeriaA);
-            var eredivisieTask = GetLeague(_currentLeagueSeasons.Eredivisie);
-            var serieABrazilTask = GetLeague(_currentLeagueSeasons.SerieABrazil);
-            var ligue1Task = GetLeague(_currentLeagueSeasons.Ligue1);
-            var laLigaTask = GetLeague(_currentLeagueSeasons.LaLiga);
-
-            var allTasks = new List<Task> { premierLeagueTask, scottishPremierLeagueTask, bundesligaTask, serieATask, eredivisieTask, serieABrazilTask, ligue1Task, laLigaTask };
-
-            while (allTasks.Any())
+            try
             {
-                Task finished = await Task.WhenAny(allTasks);
+                var leagueNavigations = new List<LeagueNavigation>();
+                string requestUri = $@"v2/leagues/current/";
+                var request = new HttpRequestMessage(
+                    HttpMethod.Get,
+                    requestUri);
+                var client = _clientFactory.CreateClient("rapidFootball");
 
-                if (finished == premierLeagueTask)
-                    leagues.Add(premierLeagueTask.Result);
-                else if (finished == scottishPremierLeagueTask)
-                    leagues.Add(scottishPremierLeagueTask.Result);
-                else if (finished == bundesligaTask)
-                    leagues.Add(bundesligaTask.Result);
-                else if (finished == serieATask)
-                    leagues.Add(serieATask.Result);
-                else if (finished == eredivisieTask)
-                    leagues.Add(eredivisieTask.Result);
-                else if (finished == serieABrazilTask)
-                    leagues.Add(serieABrazilTask.Result);
-                else if (finished == ligue1Task)
-                    leagues.Add(ligue1Task.Result);
-                else if (finished == laLigaTask)
-                    leagues.Add(laLigaTask.Result);
+                IEnumerable<League> leagues = Enumerable.Empty<League>();
 
-                allTasks.Remove(finished);
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    JObject resultJSON = JObject.Parse(responseString);
+
+                    IList<JToken> results = resultJSON["api"]["leagues"].Children().ToList();
+
+                    foreach (JToken result in results)
+                    {
+                        leagues = leagues.Append(result.ToObject<League>());
+                    }
+                }
+
+                var leaguesForNavigation = new List<League>();
+
+                var premierLeague = leagues.Where(x => x.Country.ToUpper() == "ENGLAND" && x.Name.ToUpper() == "PREMIER LEAGUE").FirstOrDefault();
+                var spl = leagues.Where(x => x.Country.ToUpper() == "SCOTLAND" && x.Name.ToUpper() == "PREMIERSHIP").FirstOrDefault();
+                var bundesliga = leagues.Where(x => x.Country.ToUpper() == "GERMANY" && x.Name.ToUpper() == "BUNDESLIGA 1").FirstOrDefault();
+                var laLiga = leagues.Where(x => x.Country.ToUpper() == "SPAIN" && x.Name.ToUpper() == "PRIMERA DIVISION").FirstOrDefault();
+                var seriaA = leagues.Where(x => x.Country.ToUpper() == "ITALY" && x.Name.ToUpper() == "SERIE A").FirstOrDefault();
+                var ligue1 = leagues.Where(x => x.Country.ToUpper() == "FRANCE" && x.Name.ToUpper() == "LIGUE 1").FirstOrDefault();
+                var eredivisie = leagues.Where(x => x.Country.ToUpper() == "NETHERLANDS" && x.Name.ToUpper() == "EREDIVISIE").FirstOrDefault();
+
+                if (premierLeague != null)
+                    leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(premierLeague));
+
+                if (spl != null)
+                {
+                    var splDTO = _mapper.Map<League, LeagueNavigation>(spl);
+                    splDTO.DisplayName = "SPL";
+                    splDTO.CountryFlag = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIbSURBVHjaYnz06BEDA0Pmzu9bp1xikOJgEOFi+PGH4c8/hl9g8h8Dw713DHc/ydYaHUiQ+vr9O0AAMdbufNzkJgPU8+3P36atj/++/fFHkO0vA0jxHyB4/v23ANukMEUuZsb///+7TTsHEEDMhy5bCOsImcnysDIxuqgLPPnz7/TxF29//Xv74cebOx9sbSSaPWVYGBmAqgs3PVyXthIggJgZPLINRDgXHnymIc8jws1iIMXtbCK65uDz39/+LinVs1PkBSo99+SLZ8u5f9/+3jv7BSCAWIB2/+Vn/fP9d/2cG/qWYpUOUoIczJvL9f/DQOHmh3u3PfwtzvFbmI3hxzeAAGICu/T/b1am39JcJ9bf8+q79B8JGDee2bvoxi8F3l9szH9+/2P4/QcggJhANjD8//P1z6/7n9TdZLcU6CBrOF1rZBCk9Ov6u1+ff/8GBdkfgAACOen3ux+/3n6rTtAwk+UCKvr8669z89nff/7tqzPiYWGcF6q4R18osfvcX1ZgWDIBBBATw7EX/KKcG8sNIKpnHH/hVH7iFxPjT2ZGs9wjPYeeAgWdVHgfzrQXkeMBRgpAADGGzr+8LEYDKPrr3/+EZXf+PP78W5TzN+P/P3///f7178+jz3+kuLana7IxAo1n4MvfDRBAjMCY/vfvn+vix7drjzCwcjBI8TB8+QGKZhD6B1L1/w0DwweGUIcr9fpAHkCAAQAGHylL06NptQAAAABJRU5ErkJggg==";
+                    leagueNavigations.Add(splDTO);
+                }
+                if (bundesliga != null)
+                    leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(bundesliga));
+
+                if (laLiga != null)
+                    leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(laLiga));
+
+                if (seriaA != null)
+                    leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(seriaA));
+
+                if (ligue1 != null)
+                    leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(ligue1));
+
+                if (eredivisie != null)
+                    leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(eredivisie));
+
+                return leagueNavigations;
             }
-
-            foreach (var league in leagues)
+            catch (Exception ex)
             {
-                leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(league));
+                _logger.LogError(ex, "An error has occured while attempting to gather league data");
+                return null;
             }
-
-            return leagueNavigations.OrderBy(l => l.Name);
         }
 
         public async Task<IEnumerable<League>> GetCurrentSeasonsAllLeagues()

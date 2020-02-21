@@ -13,6 +13,8 @@ namespace LeagueViewer.Models
 
         [JsonProperty("type")]
         public string Type { get; set; }
+        [JsonProperty("country")]
+        public string Country { get; set; }
 
         [JsonProperty("country_code")]
         public string CountryCode { get; set; }
