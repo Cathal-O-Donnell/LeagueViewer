@@ -13,17 +13,20 @@ namespace LeagueViewer.Services
 {
     public class LeagueService : ILeagueService
     {
+        private readonly AppSettings _appSettings;
         private readonly ILogger<LeagueService> _logger;
         private readonly IHttpClientFactory _clientFactory;
         private readonly CurrentLeagueSeasons _currentLeagueSeasons;
         private readonly IMapper _mapper;
 
         public LeagueService(
+            AppSettings appSettings,
             IHttpClientFactory clientFactory,
             ILogger<LeagueService> logger,
             CurrentLeagueSeasons currentLeagueSeasons,
             IMapper mapper)
         {
+            _appSettings = appSettings;
             _clientFactory = clientFactory;
             _logger = logger;
             _currentLeagueSeasons = currentLeagueSeasons;
@@ -334,7 +337,7 @@ namespace LeagueViewer.Services
                 {
                     var splDTO = _mapper.Map<League, LeagueNavigation>(spl);
                     splDTO.DisplayName = "SPL";
-                    splDTO.CountryFlag = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIbSURBVHjaYnz06BEDA0Pmzu9bp1xikOJgEOFi+PGH4c8/hl9g8h8Dw713DHc/ydYaHUiQ+vr9O0AAMdbufNzkJgPU8+3P36atj/++/fFHkO0vA0jxHyB4/v23ANukMEUuZsb///+7TTsHEEDMhy5bCOsImcnysDIxuqgLPPnz7/TxF29//Xv74cebOx9sbSSaPWVYGBmAqgs3PVyXthIggJgZPLINRDgXHnymIc8jws1iIMXtbCK65uDz39/+LinVs1PkBSo99+SLZ8u5f9/+3jv7BSCAWIB2/+Vn/fP9d/2cG/qWYpUOUoIczJvL9f/DQOHmh3u3PfwtzvFbmI3hxzeAAGICu/T/b1am39JcJ9bf8+q79B8JGDee2bvoxi8F3l9szH9+/2P4/QcggJhANjD8//P1z6/7n9TdZLcU6CBrOF1rZBCk9Ov6u1+ff/8GBdkfgAACOen3ux+/3n6rTtAwk+UCKvr8669z89nff/7tqzPiYWGcF6q4R18osfvcX1ZgWDIBBBATw7EX/KKcG8sNIKpnHH/hVH7iFxPjT2ZGs9wjPYeeAgWdVHgfzrQXkeMBRgpAADGGzr+8LEYDKPrr3/+EZXf+PP78W5TzN+P/P3///f7178+jz3+kuLana7IxAo1n4MvfDRBAjMCY/vfvn+vix7drjzCwcjBI8TB8+QGKZhD6B1L1/w0DwweGUIcr9fpAHkCAAQAGHylL06NptQAAAABJRU5ErkJggg==";
+                    splDTO.CountryFlag = _appSettings.ScotlandFlag;
                     leagueNavigations.Add(splDTO);
                 }
                 if (bundesliga != null)
