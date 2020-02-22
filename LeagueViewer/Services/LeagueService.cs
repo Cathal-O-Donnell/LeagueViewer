@@ -297,29 +297,7 @@ namespace LeagueViewer.Services
             try
             {
                 var leagueNavigations = new List<LeagueNavigation>();
-                string requestUri = $@"v2/leagues/current/";
-                var request = new HttpRequestMessage(
-                    HttpMethod.Get,
-                    requestUri);
-                var client = _clientFactory.CreateClient("rapidFootball");
-
-                IEnumerable<League> leagues = Enumerable.Empty<League>();
-
-                var response = await client.SendAsync(request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    JObject resultJSON = JObject.Parse(responseString);
-
-                    IList<JToken> results = resultJSON["api"]["leagues"].Children().ToList();
-
-                    foreach (JToken result in results)
-                    {
-                        leagues = leagues.Append(result.ToObject<League>());
-                    }
-                }
-
+                var leagues = await GetCurrentSeasonsAllLeagues();
                 var leaguesForNavigation = new List<League>();
 
                 var premierLeague = leagues.Where(x => x.Country.ToUpper() == "ENGLAND" && x.Name.ToUpper() == "PREMIER LEAGUE").FirstOrDefault();
@@ -355,7 +333,7 @@ namespace LeagueViewer.Services
                 if (eredivisie != null)
                     leagueNavigations.Add(_mapper.Map<League, LeagueNavigation>(eredivisie));
 
-                return leagueNavigations;
+                return leagueNavigations.OrderBy(x => x.DisplayName).ThenBy(x => x.Name);
             }
             catch (Exception ex)
             {
