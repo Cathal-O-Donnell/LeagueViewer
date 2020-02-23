@@ -84,7 +84,7 @@ namespace LeagueViewer.Controllers
                     .ToList();
 
                 viewModel.LeagueStanding.Form = new LeagueHelper().GetTeamForm(viewModel.LeagueStanding.Forme);
-                viewModel.PreviousFixtures = viewModel.PreviousFixtures.OrderBy(f => f.FixtureDate);
+                viewModel.PreviousFixtures = viewModel.PreviousFixtures.OrderByDescending(f => f.FixtureDate);
                 viewModel.UpcomingFixtures = viewModel.UpcomingFixtures.OrderBy(f => f.FixtureDate);
 
                 return View(viewModel);
