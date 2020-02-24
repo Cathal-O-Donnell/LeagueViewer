@@ -112,8 +112,3 @@ namespace LeagueViewer.Controllers
         }
     }
 }
-
-/*
-    TODO::
-        - Need a better way of getting the default league ids
-*/
